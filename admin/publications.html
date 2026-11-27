@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newspaper Issues | CBC The Chronicle</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
+      color: #222;
+    }
+
+    header {
+      background: #182b45;
+      color: white;
+      padding: 22px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 40px auto;
+      padding: 0 22px;
+    }
+
+    .page-heading {
+      margin-bottom: 28px;
+    }
+
+    .page-heading h2 {
+      color: #182b45;
+      margin-bottom: 8px;
+    }
+
+    .page-heading p {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: white;
+      padding: 28px;
+      border-radius: 9px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 25px;
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      color: #182b45;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      background: #fafafa;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #182b45;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .button.secondary {
+      background: #e9edf2;
+      color: #182b45;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .notice {
+      background: #f0f4f8;
+      border-left: 4px solid #182b45;
+      padding: 14px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 35px 15px;
+      color: #777;
+    }
+
+    @media (max-width: 650px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full-width {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>CBC The Chronicle | Admin</h1>
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </header>
+
+  <main>
+
+    <section class="page-heading">
+      <h2>Newspaper Issues</h2>
+      <p>Upload, organize and manage newspaper editions.</p>
+    </section>
+
+    <section class="panel">
+      <h3>Add a Newspaper Issue</h3>
+
+      <form id="publication-form">
+
+        <div class="form-grid">
+
+          <div class="field full-width">
+            <label for="title">Publication Title</label>
+            <input
+              type="text"
+              id="title"
+              placeholder="e.g. The Chronicle — Winter Edition"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="issue-number">Issue Number</label>
+            <input
+              type="text"
+              id="issue-number"
+              placeholder="e.g. Issue 01"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="published-date">Publication Date</label>
+            <input
+              type="date"
+              id="published-date"
+              required
+            >
+          </div>
+
+          <div class="field full-width">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              placeholder="Write a short introduction to this issue..."
+            ></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="pdf-file">Newspaper PDF</label>
+            <input
+              type="file"
+              id="pdf-file"
+              accept=".pdf,application/pdf"
+              required
+            >
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="button" type="submit" disabled>
+            Upload Issue (Coming Soon)
+          </button>
+          <button class="button secondary" type="reset">
+            Clear Form
+          </button>
+        </div>
+
+      </form>
+
+      <div class="notice">
+        This is the initial page layout. Database connection,
+        PDF uploading and publication controls will be added
+        in the next development stage.
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Existing Newspaper Issues</h3>
+
+      <div class="empty-state">
+        <p>No publication records are displayed yet.</p>
+        <p>Published and unpublished issues will appear here.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    async function checkAdmin() {
+      const client = window.cbcSupabase;
+
+      if (!client) {
+        window.location.replace("login.html");
+        return;
+      }
+
+      const { data, error } = await client.auth.getUser();
+
+      if (error || !data.user) {
+        window.location.replace("login.html");
+        return;
+      }
+
+      const { data: isAdmin, error: roleError } =
+        await client.rpc("has_role", {
+          _role: "admin"
+        });
+
+      if (roleError || isAdmin !== true) {
+        await client.auth.signOut();
+        window.location.replace("login.html");
+      }
+    }
+
+    checkAdmin();
+  </script>
+
+</body>
+</html>
