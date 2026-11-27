@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | CBC The Chronicle</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
+      color: #222;
+    }
+
+    header {
+      background: #182b45;
+      color: white;
+      padding: 22px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header h1 {
+      font-size: 21px;
+      margin: 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 5px;
+      padding: 11px 17px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #logout {
+      background: white;
+      color: #182b45;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 45px auto;
+      padding: 0 22px;
+    }
+
+    .welcome {
+      margin-bottom: 30px;
+    }
+
+    .welcome h2 {
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 9px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #182b45;
+    }
+
+    .card p {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 25px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    #error {
+      color: #b42318;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>CBC The Chronicle | Admin</h1>
+    <button id="logout">Log out</button>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h2>Editorial Dashboard</h2>
+      <p id="welcome-message">Checking your account...</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>Newspaper Issues</h3>
+        <p>Upload and manage newspaper PDF editions.</p>
+      </div>
+
+      <div class="card">
+        <h3>Editorial Team</h3>
+        <p>Manage editorial profiles and team information.</p>
+      </div>
+
+      <div class="card">
+        <h3>Editor Accounts</h3>
+        <p>Manage editor accounts and access permissions.</p>
+      </div>
+    </section>
+
+    <p class="status" id="status"></p>
+    <p id="error"></p>
+  </main>
+
+  <script>
+    async function initializeDashboard() {
+      const client = window.cbcSupabase;
+
+      if (!client) {
+        document.getElementById("error").textContent =
+          "Supabase configuration could not be loaded.";
+        return;
+      }
+
+      const { data, error } = await client.auth.getUser();
+
+      if (error || !data.user) {
+        window.location.replace("login.html");
+        return;
+      }
+
+      const { data: isAdmin, error: roleError } =
+        await client.rpc("has_role", {
+          _role: "admin"
+        });
+
+      if (roleError || isAdmin !== true) {
+        document.getElementById("error").textContent =
+          "Access denied. Administrator permission required.";
+
+        await client.auth.signOut();
+        setTimeout(() => {
+          window.location.replace("login.html");
+        }, 2000);
+        return;
+      }
+
+      document.getElementById("welcome-message").textContent =
+        "Welcome, " + data.user.email;
+
+      document.getElementById("status").textContent =
+        "Account verified · Administrator access granted";
+    }
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await window.cbcSupabase.auth.signOut();
+      window.location.replace("login.html");
+    });
+
+    initializeDashboard();
+  </script>
+</body>
+</html>
