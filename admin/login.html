@@ -1,141 +1,183 @@
 
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editor Login | CBC The Chronicle</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <style>
-    .login-wrap {
-      width: min(480px, calc(100% - 36px));
-      margin: 70px auto 90px;
-    }
-    .login-card {
-      background: var(--white);
-      border: 1px solid var(--line);
-      padding: 32px;
-    }
-    .login-card h2 {
-      font: 500 2.5rem/1.1 var(--serif);
-      margin: 8px 0;
-    }
-    .login-card p { color: var(--muted); }
-    .login-card input { margin-bottom: 18px; }
-    .login-card button { width: 100%; cursor: pointer; }
-    .status {
-      display: none;
-      margin-top: 18px;
-      padding: 12px;
-      background: var(--accent-soft);
-    }
-    .status.visible { display: block; }
-    .status.error { color: #813d2d; background: #f8ece8; }
-  </style>
-</head>
-<body>
-  <div class="topline">
-    <div class="wrap">
-      <span>CBC The Chronicle</span>
-      <span>Editorial Office</span>
-    </div>
-  </div>
-
-  <header class="mast">
-    <div class="wrap mast-row">
-      <a class="brand" href="../index.html">
-        <h1>CBC</h1>
-        <p class="tagline">The Chronicle</p>
-      </a>
-      <div class="edition">Editorial<br>Administration</div>
-    </div>
-  </header>
-
-  <main class="login-wrap">
-    <section class="login-card">
-      <div class="eyebrow">Editorial Office</div>
-      <h2>Editor Login</h2>
-      <p>Sign in with your CBC editorial account.</p>
-
-      <form id="login-form">
-        <label for="email">Email address</label>
-        <input id="email" type="email"
-          autocomplete="username" required>
-
-        <label for="password">Password</label>
-        <input id="password" type="password"
-          autocomplete="current-password" required>
-
-        <button class="button-submit" id="login-button">
-          Sign in
-        </button>
-      </form>
-
-      <div id="login-status" class="status"
-        role="status" aria-live="polite"></div>
-
-      <p><a href="../index.html">← Return to CBC The Chronicle</a></p>
-    </section>
-  </main>
-
-  <footer>
-    <div class="wrap">
-      <span>CBC The Chronicle</span>
-      <span>Authorized editorial access only</span>
-    </div>
-  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/supabase-client.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f4f5f7;
+      font-family: Arial, sans-serif;
+      color: #222;
+    }
+
+    .login-box {
+      width: 90%;
+      max-width: 420px;
+      padding: 38px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+    }
+
+    h1 {
+      color: #182b45;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      margin: 17px 0 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 13px;
+      border: none;
+      border-radius: 5px;
+      background: #182b45;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #message {
+      margin-top: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: #888;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-box">
+    <h1>CBC The Chronicle</h1>
+    <p class="subtitle">Editorial Management System</p>
+
+    <form id="login-form">
+      <label for="email">Email Address</label>
+      <input
+        id="email"
+        type="email"
+        required
+        autocomplete="username"
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        required
+        autocomplete="current-password"
+      >
+
+      <button id="login-button" type="submit">Sign In</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <div class="footer">
+      CBC The Chronicle · Editorial Office
+    </div>
+  </main>
+
   <script>
     const form = document.getElementById("login-form");
     const button = document.getElementById("login-button");
-    const statusBox = document.getElementById("login-status");
-
-    function showStatus(message, error = false) {
-      statusBox.textContent = message;
-      statusBox.className =
-        "status visible" + (error ? " error" : "");
-    }
+    const message = document.getElementById("message");
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      if (!window.cbcSupabase) {
-        showStatus("Login service is not configured.", true);
+      const client = window.cbcSupabase;
+
+      if (!client) {
+        message.textContent = "System configuration error.";
         return;
       }
 
       button.disabled = true;
-      button.textContent = "Signing in…";
+      message.textContent = "Signing in...";
 
-      const email =
-        document.getElementById("email").value.trim();
-      const password =
-        document.getElementById("password").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-      const { error } =
-        await window.cbcSupabase.auth.signInWithPassword({
-          email,
-          password
-        });
+      const { data, error } = await client.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      button.disabled = false;
-      button.textContent = "Sign in";
-
-      if (error) {
-        showStatus(
-          "Sign-in failed. Check your email and password.",
-          true
-        );
+      if (error || !data.user) {
+        message.textContent =
+          "Login failed. Please check your email and password.";
+        button.disabled = false;
         return;
       }
 
-      showStatus(
-        "Sign-in successful! The editorial dashboard is our next step."
-      );
-      form.reset();
+      const { data: isAdmin, error: roleError } =
+        await client.rpc("has_role", {
+          _role: "admin"
+        });
+
+      if (roleError || isAdmin !== true) {
+        await client.auth.signOut();
+
+        message.textContent =
+          "Access denied. Administrator permission is required.";
+
+        button.disabled = false;
+        return;
+      }
+
+      message.textContent = "Login successful. Redirecting...";
+
+      window.location.href = "dashboard.html";
     });
   </script>
 </body>
 </html>
+
