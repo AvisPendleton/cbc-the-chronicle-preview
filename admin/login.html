@@ -1,0 +1,141 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor Login | CBC The Chronicle</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .login-wrap {
+      width: min(480px, calc(100% - 36px));
+      margin: 70px auto 90px;
+    }
+    .login-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      padding: 32px;
+    }
+    .login-card h2 {
+      font: 500 2.5rem/1.1 var(--serif);
+      margin: 8px 0;
+    }
+    .login-card p { color: var(--muted); }
+    .login-card input { margin-bottom: 18px; }
+    .login-card button { width: 100%; cursor: pointer; }
+    .status {
+      display: none;
+      margin-top: 18px;
+      padding: 12px;
+      background: var(--accent-soft);
+    }
+    .status.visible { display: block; }
+    .status.error { color: #813d2d; background: #f8ece8; }
+  </style>
+</head>
+<body>
+  <div class="topline">
+    <div class="wrap">
+      <span>CBC The Chronicle</span>
+      <span>Editorial Office</span>
+    </div>
+  </div>
+
+  <header class="mast">
+    <div class="wrap mast-row">
+      <a class="brand" href="../index.html">
+        <h1>CBC</h1>
+        <p class="tagline">The Chronicle</p>
+      </a>
+      <div class="edition">Editorial<br>Administration</div>
+    </div>
+  </header>
+
+  <main class="login-wrap">
+    <section class="login-card">
+      <div class="eyebrow">Editorial Office</div>
+      <h2>Editor Login</h2>
+      <p>Sign in with your CBC editorial account.</p>
+
+      <form id="login-form">
+        <label for="email">Email address</label>
+        <input id="email" type="email"
+          autocomplete="username" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password"
+          autocomplete="current-password" required>
+
+        <button class="button-submit" id="login-button">
+          Sign in
+        </button>
+      </form>
+
+      <div id="login-status" class="status"
+        role="status" aria-live="polite"></div>
+
+      <p><a href="../index.html">← Return to CBC The Chronicle</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>CBC The Chronicle</span>
+      <span>Authorized editorial access only</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script>
+    const form = document.getElementById("login-form");
+    const button = document.getElementById("login-button");
+    const statusBox = document.getElementById("login-status");
+
+    function showStatus(message, error = false) {
+      statusBox.textContent = message;
+      statusBox.className =
+        "status visible" + (error ? " error" : "");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!window.cbcSupabase) {
+        showStatus("Login service is not configured.", true);
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Signing in…";
+
+      const email =
+        document.getElementById("email").value.trim();
+      const password =
+        document.getElementById("password").value;
+
+      const { error } =
+        await window.cbcSupabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      button.disabled = false;
+      button.textContent = "Sign in";
+
+      if (error) {
+        showStatus(
+          "Sign-in failed. Check your email and password.",
+          true
+        );
+        return;
+      }
+
+      showStatus(
+        "Sign-in successful! The editorial dashboard is our next step."
+      );
+      form.reset();
+    });
+  </script>
+</body>
+</html>
