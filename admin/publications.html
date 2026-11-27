@@ -1,26 +1,22 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Newspaper Issues | CBC The Chronicle</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../assets/js/supabase-client.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f5f7;
       color: #222;
     }
-
     header {
       background: #182b45;
       color: white;
@@ -29,38 +25,12 @@
       justify-content: space-between;
       align-items: center;
     }
-
-    header h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    header a {
-      color: white;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    main {
-      max-width: 1050px;
-      margin: 40px auto;
-      padding: 0 22px;
-    }
-
-    .page-heading {
-      margin-bottom: 28px;
-    }
-
-    .page-heading h2 {
-      color: #182b45;
-      margin-bottom: 8px;
-    }
-
-    .page-heading p {
-      color: #666;
-      line-height: 1.5;
-    }
-
+    header h1 { font-size: 20px; margin: 0; }
+    header a { color: white; text-decoration: none; font-size: 14px; }
+    main { max-width: 1050px; margin: 40px auto; padding: 0 22px; }
+    .page-heading { margin-bottom: 28px; }
+    .page-heading h2 { color: #182b45; margin-bottom: 8px; }
+    .page-heading p { color: #666; line-height: 1.5; }
     .panel {
       background: white;
       padding: 28px;
@@ -68,33 +38,15 @@
       border: 1px solid #e5e7eb;
       margin-bottom: 25px;
     }
-
-    .panel h3 {
-      margin-top: 0;
-      color: #182b45;
-    }
-
+    .panel h3 { margin-top: 0; color: #182b45; }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .full-width {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      font-size: 14px;
-      font-weight: bold;
-    }
-
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .full-width { grid-column: 1 / -1; }
+    label { font-size: 14px; font-weight: bold; }
     input, textarea {
       width: 100%;
       padding: 12px;
@@ -102,16 +54,8 @@
       border-radius: 5px;
       font: inherit;
     }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    input[type="file"] {
-      background: #fafafa;
-    }
-
+    textarea { min-height: 110px; resize: vertical; }
+    input[type="file"] { background: #fafafa; }
     .button {
       display: inline-block;
       padding: 12px 20px;
@@ -123,18 +67,9 @@
       text-decoration: none;
       font-size: 14px;
     }
-
-    .button.secondary {
-      background: #e9edf2;
-      color: #182b45;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 22px;
-    }
-
+    .button:disabled { opacity: .6; cursor: not-allowed; }
+    .button.secondary { background: #e9edf2; color: #182b45; }
+    .actions { display: flex; gap: 12px; margin-top: 22px; }
     .notice {
       background: #f0f4f8;
       border-left: 4px solid #182b45;
@@ -144,34 +79,45 @@
       line-height: 1.5;
       margin-top: 20px;
     }
-
-    .empty-state {
-      text-align: center;
-      padding: 35px 15px;
-      color: #777;
+    .notice.error {
+      background: #fff1f0;
+      border-left-color: #b42318;
+      color: #8a1c13;
     }
-
+    .issue-list { display: grid; gap: 14px; }
+    .issue-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 7px;
+      padding: 17px;
+    }
+    .issue-item h4 { margin: 0 0 8px; color: #182b45; }
+    .issue-meta { color: #666; font-size: 13px; line-height: 1.6; }
+    .status {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: #eef2f6;
+      color: #344054;
+      font-size: 12px;
+      text-transform: capitalize;
+    }
+    .empty-state { text-align: center; padding: 35px 15px; color: #777; }
     @media (max-width: 650px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .full-width {
-        grid-column: auto;
-      }
+      .form-grid { grid-template-columns: 1fr; }
+      .full-width { grid-column: auto; }
+      header { gap: 16px; }
     }
   </style>
 </head>
 
 <body>
-
   <header>
     <h1>CBC The Chronicle | Admin</h1>
     <a href="dashboard.html">← Back to Dashboard</a>
   </header>
 
   <main>
-
     <section class="page-heading">
       <h2>Newspaper Issues</h2>
       <p>Upload, organize and manage newspaper editions.</p>
@@ -181,116 +127,241 @@
       <h3>Add a Newspaper Issue</h3>
 
       <form id="publication-form">
-
         <div class="form-grid">
-
           <div class="field full-width">
             <label for="title">Publication Title</label>
-            <input
-              type="text"
-              id="title"
-              placeholder="e.g. The Chronicle — Winter Edition"
-              required
-            >
+            <input type="text" id="title" placeholder="e.g. The Chronicle — Winter Edition" required>
           </div>
 
           <div class="field">
             <label for="issue-number">Issue Number</label>
-            <input
-              type="text"
-              id="issue-number"
-              placeholder="e.g. Issue 01"
-              required
-            >
+            <input type="text" id="issue-number" placeholder="e.g. Issue 01" required>
           </div>
 
           <div class="field">
             <label for="published-date">Publication Date</label>
-            <input
-              type="date"
-              id="published-date"
-              required
-            >
+            <input type="date" id="published-date" required>
           </div>
 
           <div class="field full-width">
             <label for="description">Description</label>
-            <textarea
-              id="description"
-              placeholder="Write a short introduction to this issue..."
-            ></textarea>
+            <textarea id="description" placeholder="Write a short introduction to this issue..."></textarea>
           </div>
 
           <div class="field full-width">
             <label for="pdf-file">Newspaper PDF</label>
-            <input
-              type="file"
-              id="pdf-file"
-              accept=".pdf,application/pdf"
-              required
-            >
+            <input type="file" id="pdf-file" accept=".pdf,application/pdf" required>
+            <small>PDF only. Maximum file size: 25 MB.</small>
           </div>
-
         </div>
 
         <div class="actions">
-          <button class="button" type="submit" disabled>
-            Upload Issue (Coming Soon)
-          </button>
-          <button class="button secondary" type="reset">
-            Clear Form
-          </button>
+          <button class="button" id="upload-button" type="submit">Upload as Draft</button>
+          <button class="button secondary" type="reset">Clear Form</button>
         </div>
-
       </form>
 
-      <div class="notice">
-        This is the initial page layout. Database connection,
-        PDF uploading and publication controls will be added
-        in the next development stage.
+      <div class="notice" id="form-message" role="status">
+        New uploads are saved as drafts. They will not be visible to readers until a later publishing step.
       </div>
     </section>
 
     <section class="panel">
       <h3>Existing Newspaper Issues</h3>
-
-      <div class="empty-state">
-        <p>No publication records are displayed yet.</p>
-        <p>Published and unpublished issues will appear here.</p>
-      </div>
+      <div id="issue-list" class="empty-state">Loading publication records...</div>
     </section>
-
   </main>
 
   <script>
-    async function checkAdmin() {
-      const client = window.cbcSupabase;
+    const client = window.cbcSupabase;
+    const form = document.getElementById("publication-form");
+    const uploadButton = document.getElementById("upload-button");
+    const formMessage = document.getElementById("form-message");
+    const issueList = document.getElementById("issue-list");
 
+    function showMessage(message, isError) {
+      formMessage.textContent = message;
+      formMessage.classList.toggle("error", Boolean(isError));
+    }
+
+    function makeSlug(value) {
+      return value.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    function addTextElement(parent, tagName, className, text) {
+      const element = document.createElement(tagName);
+      if (className) element.className = className;
+      element.textContent = text || "";
+      parent.appendChild(element);
+      return element;
+    }
+
+    async function loadPublications() {
+      const { data, error } = await client.from("publications")
+        .select("id, title, issue_number, publication_date, description, status, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        issueList.className = "empty-state";
+        issueList.textContent = "Could not load publication records: " + error.message;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        issueList.className = "empty-state";
+        issueList.textContent = "No publication records yet. Upload your first issue above.";
+        return;
+      }
+
+      issueList.className = "issue-list";
+      issueList.replaceChildren();
+
+      data.forEach(function (publication) {
+        const item = document.createElement("article");
+        item.className = "issue-item";
+
+        addTextElement(item, "h4", "", publication.title);
+        addTextElement(item, "div", "issue-meta",
+          "Issue: " + publication.issue_number +
+          " | Publication date: " + (publication.publication_date || "Not set"));
+
+        if (publication.description) {
+          addTextElement(item, "p", "issue-meta", publication.description);
+        }
+
+        addTextElement(item, "span", "status", publication.status || "draft");
+        issueList.appendChild(item);
+      });
+    }
+
+    async function checkAdmin() {
       if (!client) {
         window.location.replace("login.html");
-        return;
+        return false;
       }
 
       const { data, error } = await client.auth.getUser();
 
       if (error || !data.user) {
         window.location.replace("login.html");
-        return;
+        return false;
       }
 
-      const { data: isAdmin, error: roleError } =
-        await client.rpc("has_role", {
-          _role: "admin"
-        });
+      const { data: isAdmin, error: roleError } = await client.rpc("has_role", {
+        _role: "admin"
+      });
 
       if (roleError || isAdmin !== true) {
         await client.auth.signOut();
         window.location.replace("login.html");
+        return false;
       }
+
+      return true;
     }
 
-    checkAdmin();
-  </script>
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
+      const title = document.getElementById("title").value.trim();
+      const issueNumber = document.getElementById("issue-number").value.trim();
+      const publicationDate = document.getElementById("published-date").value;
+      const description = document.getElementById("description").value.trim();
+      const file = document.getElementById("pdf-file").files[0];
+
+      if (!file) {
+        showMessage("Please choose a PDF file first.", true);
+        return;
+      }
+
+      if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+        showMessage("The selected file does not appear to be a PDF.", true);
+        return;
+      }
+
+      if (file.size > 25 * 1024 * 1024) {
+        showMessage("This PDF is larger than 25 MB. Please choose a smaller file.", true);
+        return;
+      }
+
+      uploadButton.disabled = true;
+      uploadButton.textContent = "Uploading...";
+      showMessage("Uploading the PDF and saving the draft. Please keep this page open...", false);
+
+      let uploadedPath = null;
+
+      try {
+        const { data: userData, error: userError } = await client.auth.getUser();
+
+        if (userError || !userData.user) {
+          throw new Error("Your login session has expired. Please sign in again.");
+        }
+
+        const user = userData.user;
+        const filePath = user.id + "/" + crypto.randomUUID() + ".pdf";
+        uploadedPath = filePath;
+
+        const { error: storageError } = await client.storage
+          .from("newspapers")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: "application/pdf"
+          });
+
+        if (storageError) throw storageError;
+
+        const publicationRecord = {
+          id: crypto.randomUUID(),
+          title: title,
+          issue_number: issueNumber,
+          slug: (makeSlug(issueNumber + "-" + title) || "newspaper-issue") + "-" + crypto.randomUUID().slice(0, 8),
+          publication_date: publicationDate,
+          description: description || null,
+          pdf_path: filePath,
+          status: "draft",
+          featured: false,
+          created_by: user.id
+        };
+
+        const { error: insertError } = await client
+          .from("publications")
+          .insert(publicationRecord);
+
+        if (insertError) {
+          await client.storage.from("newspapers").remove([filePath]);
+          uploadedPath = null;
+          throw insertError;
+        }
+
+        uploadedPath = null;
+        form.reset();
+
+        showMessage("Success! The PDF has been uploaded and the issue has been saved as a draft.", false);
+        await loadPublications();
+
+      } catch (error) {
+        if (uploadedPath) {
+          await client.storage.from("newspapers").remove([uploadedPath]);
+        }
+
+        showMessage("Upload failed: " + (error.message || "An unexpected error occurred."), true);
+
+      } finally {
+        uploadButton.disabled = false;
+        uploadButton.textContent = "Upload as Draft";
+      }
+    });
+
+    checkAdmin().then(function (allowed) {
+      if (allowed) loadPublications();
+    });
+  </script>
 </body>
 </html>
+
